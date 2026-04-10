@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Future of Work — AI &amp; Jobs 2015–2035</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f4ef;
+      --surface: #ffffff;
+      --surface2: #eeede7;
+      --text: #1a1a18;
+      --text2: #5a5a55;
+      --text3: #9a9990;
+      --orange: #d4621a;
+      --orange-light: #f5e8de;
+      --green: #1d9e75;
+      --green-light: #e1f5ee;
+      --blue: #185fa5;
+      --blue-light: #e6f1fb;
+      --border: rgba(0,0,0,0.08);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    header .logo span { color: var(--orange); }
+    header .year-badge {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text3);
+      background: var(--surface2);
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: var(--green-light);
+      border-bottom: 1px solid rgba(29,158,117,0.15);
+      padding: 2.5rem 2rem;
+    }
+    .hero-inner { max-width: 860px; margin: 0 auto; }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(22px, 4vw, 34px);
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .hero h1 em { color: var(--green); font-style: normal; }
+    .hero-bullets {
+      list-style: disc;
+      padding-left: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .hero-bullets li {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.55;
+    }
+
+    /* ── Main layout ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 1.75rem;
+    }
+    .tab {
+      padding: 10px 22px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .tab:active { transform: scale(0.97); }
+    .tab-orange { background: var(--orange); color: #fff; }
+    .tab-white  { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+    .tab-green  { background: var(--green); color: #fff; }
+    .tab:not(.tab-orange):not(.tab-green):hover { background: var(--surface2); }
+
+    /* ── Panels ── */
+    .panel { display: none; animation: fadeIn 0.2s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    /* ── Stat cards ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 1.75rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1rem;
+      text-align: center;
+    }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    .stat-change {
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: 6px;
+    }
+    .pos { color: var(--green); }
+    .neg { color: var(--orange); }
+
+    /* ── Section title ── */
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Finding cards ── */
+    .findings {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .finding-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      transition: box-shadow 0.15s;
+    }
+    .finding-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .finding-card .icon { font-size: 18px; margin-bottom: 8px; }
+    .finding-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+    .finding-card p { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+    /* ── 2-col charts row ── */
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 1.25rem;
+    }
+    @media (max-width: 600px) { .row2 { grid-template-columns: 1fr; } }
+    .chart-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+    }
+
+    /* ── Bar chart ── */
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+    .bar-label { font-size: 11px; color: var(--text2); width: 88px; flex-shrink: 0; text-align: right; }
+    .bar-track { flex: 1; height: 13px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+    .bar-val { font-size: 11px; color: var(--text2); width: 30px; flex-shrink: 0; }
+
+    /* ── Tableau image cards ── */
+    .tableau-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.15s, transform 0.15s;
+    }
+    .tableau-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+    .tableau-img-wrap {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: var(--surface2);
+    }
+    .tableau-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+    }
+
+    /* ── Viz embed card (iframe) ── */
+    .viz-embed-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .viz-embed-card .iframe-wrap {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+    .viz-embed-card .iframe-wrap iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 960px;
+      height: 500px;
+      border: none;
+      transform-origin: top left;
+    }
+    .viz-embed-card .viz-title {
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Viz grid (3×3) ── */
+    .viz-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 600px) { .viz-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 400px) { .viz-grid { grid-template-columns: 1fr; } }
+    .viz-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+    .viz-card:hover {
+      border-color: rgba(0,0,0,0.18);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .viz-thumb {
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .viz-title {
+      padding: 8px 10px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 4rem;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text3);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">AI<span>&</span>Jobs</div>
+  <div class="year-badge">2015 – 2035</div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <h1>The Future of Work — <em>AI &amp; Jobs</em> 2015–2035</h1>
+    <ul class="hero-bullets">
+      <li>This visualization explores the evolving relationship between Artificial Intelligence, job markets, skills, and salaries across the globe from 2015 to 2035.</li>
+      <li>With the rapid rise of AI technologies, questions like "Will AI replace my job?" and "Which skills are future-proof?" have become more relevant than ever. This visualization is designed to answer these questions using data-driven insights and visualization-ready features.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab tab-orange" onclick="switchTab('overview')">Overview</button>
+    <button class="tab tab-white" onclick="switchTab('vizhub')">Vizhub Visualizations</button>
+    <button class="tab tab-green" onclick="switchTab('tableau')">Tableau</button>
+  </div>
+
+  <!-- ══ OVERVIEW ══ -->
+  <div id="panel-overview" class="panel active">
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num">85M</div>
+        <div class="stat-label">jobs displaced by automation by 2025</div>
+        <div class="stat-change neg">↑ from 2020 estimates</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">97M</div>
+        <div class="stat-label">new AI-augmented roles emerging</div>
+        <div class="stat-change pos">↑ net positive outlook</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">40%</div>
+        <div class="stat-label">of global workforce impacted by AI</div>
+        <div class="stat-change neg">↑ by 2035 projection</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">+$16K</div>
+        <div class="stat-label">avg salary premium for AI skills</div>
+        <div class="stat-change pos">↑ 38% since 2020</div>
+      </div>
+    </div>
+
+    <div class="section-title">Key findings</div>
+    <div class="findings">
+      <div class="finding-card">
+        <div class="icon">🤖</div>
+        <h3>Automation risk by sector</h3>
+        <p>Manufacturing (72%) and retail (58%) face the highest automation risk, while healthcare (18%) and education (15%) remain largely resilient.</p>
+      </div>
+      <div class="finding-card">
+        <div class="icon">📈</div>
+        <h3>AI skill premium growing</h3>
+        <p>Workers with AI/ML proficiency earn 35–45% more than peers in the same role. The premium has doubled since 2019.</p>
+      </div>
+      <div class="finding-card">
+        <div class="icon">🌍</div>
+        <h3>Regional divide widening</h3>
+        <p>North America and East Asia lead in AI adoption. Sub-Saharan Africa and South Asia show slower transitions but high growth potential.</p>
+      </div>
+      <div class="finding-card">
+        <div class="icon">🎓</div>
+        <h3>Reskilling urgency</h3>
+        <p>54% of workers will need significant reskilling by 2025. Companies investing in upskilling see 2.4× higher retention rates.</p>
+      </div>
+      <div class="finding-card">
+        <div class="icon">⚖️</div>
+        <h3>Gender gap in AI roles</h3>
+        <p>Women hold only 26% of AI and data science roles globally, though the gap is narrowing at 1.2 percentage points per year.</p>
+      </div>
+      <div class="finding-card">
+        <div class="icon">🚀</div>
+        <h3>Top future-proof skills</h3>
+        <p>Critical thinking, creativity, and complex problem-solving rank as the least automatable skills through 2035.</p>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="chart-box">
+        <div class="section-title">Automation risk by industry</div>
+        <div class="bar-row"><span class="bar-label">Manufacturing</span><div class="bar-track"><div class="bar-fill" style="width:72%;background:#d4621a"></div></div><span class="bar-val">72%</span></div>
+        <div class="bar-row"><span class="bar-label">Retail</span><div class="bar-track"><div class="bar-fill" style="width:58%;background:#d4621a"></div></div><span class="bar-val">58%</span></div>
+        <div class="bar-row"><span class="bar-label">Finance</span><div class="bar-track"><div class="bar-fill" style="width:45%;background:#e8a020"></div></div><span class="bar-val">45%</span></div>
+        <div class="bar-row"><span class="bar-label">Transport</span><div class="bar-track"><div class="bar-fill" style="width:41%;background:#e8a020"></div></div><span class="bar-val">41%</span></div>
+        <div class="bar-row"><span class="bar-label">Healthcare</span><div class="bar-track"><div class="bar-fill" style="width:18%;background:#1d9e75"></div></div><span class="bar-val">18%</span></div>
+        <div class="bar-row"><span class="bar-label">Education</span><div class="bar-track"><div class="bar-fill" style="width:15%;background:#1d9e75"></div></div><span class="bar-val">15%</span></div>
+      </div>
+      <div class="chart-box">
+        <div class="section-title">Job growth vs displacement (2015–2035)</div>
+        <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:160px">
+          <polyline points="10,140 50,130 90,110 130,90 170,60 210,35 250,20" fill="none" stroke="#1d9e75" stroke-width="2" stroke-linejoin="round"/>
+          <polyline points="10,50 50,65 90,85 130,110 170,125 210,130 250,132" fill="none" stroke="#d4621a" stroke-width="2" stroke-linejoin="round"/>
+          <text x="252" y="18" font-size="10" fill="#1d9e75" font-family="DM Sans, sans-serif">New roles</text>
+          <text x="252" y="130" font-size="10" fill="#d4621a" font-family="DM Sans, sans-serif">Displaced</text>
+          <text x="10" y="158" font-size="9" fill="#9a9990" font-family="DM Sans, sans-serif">2015</text>
+          <text x="110" y="158" font-size="9" fill="#9a9990" font-family="DM Sans, sans-serif">2025</text>
+          <text x="230" y="158" font-size="9" fill="#9a9990" font-family="DM Sans, sans-serif">2035</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIZHUB ══ -->
+  <div id="panel-vizhub" class="panel">
+    <div class="section-title" style="margin-bottom:8px;font-size:12px;">Vizhub visualizations</div>
+    <div class="viz-grid" style="grid-template-columns:repeat(3,1fr);max-width:100%">
+
+      <div class="viz-embed-card">
+        <div class="iframe-wrap"><iframe src="https://vizhub.com/LohithKumar0510/d5cbdde66fa3462b846527d8d0562c1c?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Donut Chart of Share of Jobs by AI Risk Category" loading="lazy"></iframe></div>
+        <div class="viz-title">Donut Chart — Share of Jobs by AI Risk Category</div>
+      </div>
+
+      <div class="viz-embed-card">
+        <div class="iframe-wrap"><iframe src="https://vizhub.com/LohithKumar0510/09a0b405b87d4adda32510e38ce42a3f?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Bubble Chart of Job Openings by Primary Skill" loading="lazy"></iframe></div>
+        <div class="viz-title">Bubble Chart — Job Openings by Primary Skill</div>
+      </div>
+
+      <div class="viz-embed-card">
+        <div class="iframe-wrap"><iframe src="https://vizhub.com/LohithKumar0510/ee39b63a566a4705aa33a7137716c7a6?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Bar Chart of Average AI Risk Score by Job Title" loading="lazy"></iframe></div>
+        <div class="viz-title">Bar Chart — Average AI Risk Score by Job Title</div>
+      </div>
+
+      <div class="viz-embed-card">
+        <div class="iframe-wrap"><iframe src="https://vizhub.com/LohithKumar0510/c855b76d04354ea798412ba5749dd6a8?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Line Chart of Average Salary Over Time" loading="lazy"></iframe></div>
+        <div class="viz-title">Line Chart — Average Salary Over Time</div>
+      </div>
+
+      <div class="viz-embed-card">
+        <div class="iframe-wrap"><iframe src="https://vizhub.com/LohithKumar0510/56d9349ceea242bf9616f7974a8fe5d3?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Scatter Plot of Salary vs AI Risk Score" loading="lazy"></iframe></div>
+        <div class="viz-title">Scatter Plot — Salary vs AI Risk Score</div>
+      </div>
+
+      <div class="viz-embed-card">
+        <div class="iframe-wrap"><iframe src="https://vizhub.com/LohithKumar0510/5068f19777d3480c912fbece3629d42e?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Bar Chart of Average Salary by Country" loading="lazy"></iframe></div>
+        <div class="viz-title">Bar Chart — Average Salary by Country</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ TABLEAU ══ -->
+  <div id="panel-tableau" class="panel">
+    <div class="section-title" style="margin-bottom:8px;font-size:12px;">Tableau visualizations</div>
+    <div class="viz-grid">
+
+      <div class="tableau-card">
+        <div class="tableau-img-wrap">
+          <img src="images/image1.png" alt="Horizontal Bar Chart: Total Job Openings by Job Title" loading="lazy" />
+        </div>
+        <div class="viz-title">Horizontal Bar Chart — Total Job Openings by Job Title</div>
+      </div>
+
+      <div class="tableau-card">
+        <div class="tableau-img-wrap">
+          <img src="images/image2.png" alt="Line Chart: Average Risk Score Over Time (2015–2035)" loading="lazy" />
+        </div>
+        <div class="viz-title">Line Chart — Average Risk Score Over Time (2015–2035)</div>
+      </div>
+
+      <div class="tableau-card">
+        <div class="tableau-img-wrap">
+          <img src="images/Image3.png" alt="Scatter Plot: Comparison of Salary and Occupation in 6 Countries" loading="lazy" />
+        </div>
+        <div class="viz-title">Scatter Plot — Salary vs Occupation across 6 Countries</div>
+      </div>
+
+      <div class="tableau-card">
+        <div class="tableau-img-wrap">
+          <img src="images/image4.png" alt="Symbol Map: AI Risk Across Countries" loading="lazy" />
+        </div>
+        <div class="viz-title">Symbol Map — AI Risk Across Countries</div>
+      </div>
+
+      <div class="tableau-card">
+        <div class="tableau-img-wrap">
+          <img src="images/image5.png" alt="Line Chart: Skill Demand Trend from 2015 to 2035" loading="lazy" />
+        </div>
+        <div class="viz-title">Line Chart — Skill Demand Trend 2015–2035</div>
+      </div>
+
+      <div class="tableau-card">
+        <div class="tableau-img-wrap">
+          <img src="images/image6.png" alt="Heatmap: Country vs Job Title" loading="lazy" />
+        </div>
+        <div class="viz-title">Heatmap — Country vs Job Title</div>
+      </div>
+
+      <div class="tableau-card">
+        <div class="tableau-img-wrap">
+          <img src="images/image7.png" alt="Bubble Chart: Job Occupations with Most Openings" loading="lazy" />
+        </div>
+        <div class="viz-title">Bubble Chart — Occupations with Most Openings</div>
+      </div>
+
+      <div class="tableau-card">
+        <div class="tableau-img-wrap">
+          <img src="images/image8.png" alt="Bubble Chart: Jobs with Highest Salaries" loading="lazy" />
+        </div>
+        <div class="viz-title">Bubble Chart — Jobs with Highest Salaries</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Data sources: World Economic Forum, McKinsey Global Institute, OECD, ILO · 2015–2035
+</footer>
+
+<script>
+  function switchTab(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t => { t.style.opacity = '0.65'; });
+    const map = { overview: 0, vizhub: 1, tableau: 2 };
+    document.querySelectorAll('.tab')[map[name]].style.opacity = '1';
+    if (name === 'vizhub') scaleIframes();
+  }
+
+  function scaleIframes() {
+    document.querySelectorAll('.iframe-wrap').forEach(wrap => {
+      const iframe = wrap.querySelector('iframe');
+      const scale = wrap.offsetWidth / 960;
+      iframe.style.transform = `scale(${scale})`;
+      wrap.style.height = Math.round(500 * scale) + 'px';
+    });
+  }
+
+  window.addEventListener('load', scaleIframes);
+  window.addEventListener('resize', scaleIframes);
+  document.addEventListener('DOMContentLoaded', scaleIframes);
+</script>
+
+</body>
+</html>
