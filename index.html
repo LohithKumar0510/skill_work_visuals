@@ -252,6 +252,12 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      cursor: pointer;
+      transition: box-shadow 0.15s, transform 0.15s;
+    }
+    .viz-embed-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
     }
     .viz-embed-card .iframe-wrap {
       position: relative;
@@ -266,12 +272,13 @@
       height: 650px;
       border: none;
       transform-origin: top left;
+      pointer-events: none;
     }
     .viz-embed-card .viz-title {
       border-top: 1px solid var(--border);
     }
 
-    /* ── Viz grid (3×3) ── */
+    /* ── Viz grid ── */
     .viz-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -279,6 +286,7 @@
     }
     @media (max-width: 600px) { .viz-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 400px) { .viz-grid { grid-template-columns: 1fr; } }
+
     .viz-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -317,376 +325,380 @@
       color: var(--text3);
       border-top: 1px solid var(--border);
     }
+
     .max-btn {
-  position:absolute;
-  top:8px;
-  right:8px;
-  background:rgba(0,0,0,0.6);
-  color:white;
-  border:none;
-  padding:4px 8px;
-  cursor:pointer;
-}
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      cursor: pointer;
+      z-index: 5;
+      border-radius: 4px;
+    }
 
-.fullscreen-modal {
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:black;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-}
+    .fullscreen-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
 
-.fullscreen-modal iframe {
-  width:95%;
-  height:95%;
-}
+    .fullscreen-modal iframe {
+      width: 95%;
+      height: 95%;
+      border: none;
+      background: white;
+    }
 
-.close-btn {
-  position:absolute;
-  top:15px;
-  right:20px;
-  color:white;
-  font-size:24px;
-  cursor:pointer;
-}
-    
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 10000;
+    }
   </style>
 </head>
 <body>
-<div id="fullscreenModal" class="fullscreen-modal">
-  <span class="close-btn" onclick="closeFullscreen()">✖</span>
-  <iframe id="fullscreenFrame"></iframe>
-</div>
-<header>
-  <div class="logo">AI<span>&</span>Jobs</div>
-  <div class="year-badge">2015 – 2035</div>
-</header>
-
-<div class="hero">
-  <div class="hero-inner">
-    <h1>The Future of Work — <em>AI &amp; Jobs</em> 2015–2035</h1>
-    <ul class="hero-bullets">
-      <li>This visualization explores the evolving relationship between Artificial Intelligence, job markets, skills, and salaries across the globe from 2015 to 2035.</li>
-      <li>With the rapid rise of AI technologies, questions like "Will AI replace my job?" and "Which skills are future-proof?" have become more relevant than ever. This visualization is designed to answer these questions using data-driven insights and visualization-ready features.</li>
-    </ul>
-  </div>
-</div>
-
-<div class="container">
-
-  <div class="tabs">
-    <button class="tab tab-orange" onclick="switchTab('overview')">My Dataset Overview</button>
-    <button class="tab tab-white" onclick="switchTab('vizhub')">Vizhub Visualizations</button>
-    <button class="tab tab-green" onclick="switchTab('tableau')">Tableau</button>
+  <div id="fullscreenModal" class="fullscreen-modal">
+    <span class="close-btn" onclick="closeFullscreen()">✖</span>
+    <iframe id="fullscreenFrame"></iframe>
   </div>
 
-  <!-- ══ OVERVIEW ══ -->
-  <div id="panel-overview" class="panel active">
+  <header>
+    <div class="logo">AI<span>&</span>Jobs</div>
+    <div class="year-badge">2015 – 2035</div>
+  </header>
 
-    <!-- Row 1: Core dataset stats -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-num">12,343</div>
-        <div class="stat-label">job records across 6 countries</div>
-        <div class="stat-change pos">2015 – 2035</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">311M</div>
-        <div class="stat-label">total job openings in dataset</div>
-        <div class="stat-change pos">across 10 job titles</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">$34,554</div>
-        <div class="stat-label">overall average salary (USD)</div>
-        <div class="stat-change pos">range: $3,875 – $113,589</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">0.396</div>
-        <div class="stat-label">mean AI risk score (0–1 scale)</div>
-        <div class="stat-change neg">↑ from 0.295 in 2015 to 0.491 in 2035</div>
-      </div>
-    </div>
-
-    <!-- Row 2: AI Risk breakdown + Salary by risk -->
-    <div class="row2" style="margin-top:0;margin-bottom:12px;">
-      <div class="chart-box">
-        <div class="section-title">AI risk category breakdown</div>
-        <div class="bar-row"><span class="bar-label">Medium Risk</span><div class="bar-track"><div class="bar-fill" style="width:48.7%;background:#e8a020"></div></div><span class="bar-val">48.7%</span></div>
-        <div class="bar-row"><span class="bar-label">Low Risk</span><div class="bar-track"><div class="bar-fill" style="width:32.7%;background:#1d9e75"></div></div><span class="bar-val">32.7%</span></div>
-        <div class="bar-row"><span class="bar-label">High Risk</span><div class="bar-track"><div class="bar-fill" style="width:18.6%;background:#d4621a"></div></div><span class="bar-val">18.6%</span></div>
-        <div style="margin-top:14px;">
-          <div class="section-title" style="margin-bottom:6px;">Avg salary by risk category</div>
-          <div class="bar-row"><span class="bar-label">Low Risk</span><div class="bar-track"><div class="bar-fill" style="width:80%;background:#1d9e75"></div></div><span class="bar-val">$36,615</span></div>
-          <div class="bar-row"><span class="bar-label">Medium Risk</span><div class="bar-track"><div class="bar-fill" style="width:82%;background:#e8a020"></div></div><span class="bar-val">$37,450</span></div>
-          <div class="bar-row"><span class="bar-label">High Risk</span><div class="bar-track"><div class="bar-fill" style="width:51%;background:#d4621a"></div></div><span class="bar-val">$23,334</span></div>
-        </div>
-      </div>
-
-      <div class="chart-box">
-        <div class="section-title">Average salary trend (2015–2035)</div>
-        <svg viewBox="0 0 280 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:140px">
-          <!-- salary trend: 26722→27954→27800→28933→30977→29905→30445→31764→32945→33011→...→~44000 -->
-          <polyline points="10,118 23,114 36,115 49,110 62,102 75,106 88,104 101,98 114,94 127,93 140,89 153,84 166,78 179,72 192,64 205,56 218,48 231,38 244,28 257,18 270,10"
-            fill="none" stroke="#1d9e75" stroke-width="2" stroke-linejoin="round"/>
-          <text x="10" y="132" font-size="9" fill="#9a9990" font-family="DM Sans,sans-serif">2015</text>
-          <text x="110" y="132" font-size="9" fill="#9a9990" font-family="DM Sans,sans-serif">2025</text>
-          <text x="240" y="132" font-size="9" fill="#9a9990" font-family="DM Sans,sans-serif">2035</text>
-          <text x="272" y="13" font-size="9" fill="#1d9e75" font-family="DM Sans,sans-serif">↑</text>
-          <text x="4" y="118" font-size="8" fill="#9a9990" font-family="DM Sans,sans-serif">$27K</text>
-          <text x="248" y="14" font-size="8" fill="#9a9990" font-family="DM Sans,sans-serif">$44K</text>
-        </svg>
-
-        <div class="section-title" style="margin-top:8px;margin-bottom:6px;">Job survival outlook</div>
-        <div class="bar-row"><span class="bar-label">Will survive</span><div class="bar-track"><div class="bar-fill" style="width:42%;background:#1d9e75"></div></div><span class="bar-val">42%</span></div>
-        <div class="bar-row"><span class="bar-label">Likely survive</span><div class="bar-track"><div class="bar-fill" style="width:47%;background:#e8a020"></div></div><span class="bar-val">47%</span></div>
-        <div class="bar-row"><span class="bar-label">At risk</span><div class="bar-track"><div class="bar-fill" style="width:11%;background:#d4621a"></div></div><span class="bar-val">11%</span></div>
-      </div>
-    </div>
-
-    <!-- Row 3: Key findings -->
-    <div class="section-title">Key findings</div>
-    <div class="findings">
-      <div class="finding-card">
-        <div class="icon">🏆</div>
-        <h3>Highest paying roles</h3>
-        <p>AI Researcher ($46,128), ML Engineer ($41,360), and Product Manager ($40,940) lead in average salary — all above the dataset mean of $34,554.</p>
-      </div>
-      <div class="finding-card">
-        <div class="icon">⚠️</div>
-        <h3>Most at-risk roles</h3>
-        <p>Data Analyst ($20,310 avg) and Business Analyst ($24,783) are the lowest-paid titles — yet Business Analyst has the most job openings (33.6M).</p>
-      </div>
-      <div class="finding-card">
-        <div class="icon">🌍</div>
-        <h3>USA leads on salary</h3>
-        <p>USA averages $47,629 — 3.5× higher than India ($13,615). UK ($38,176) and Australia ($36,915) follow. All 6 countries share similar avg risk scores (~0.395).</p>
-      </div>
-      <div class="finding-card">
-        <div class="icon">💡</div>
-        <h3>Most in-demand skill</h3>
-        <p>Python dominates with 2,430 records. Excel has the highest AI risk score (0.75) while Deep Learning commands the highest avg salary at $46,128.</p>
-      </div>
-      <div class="finding-card">
-        <div class="icon">📈</div>
-        <h3>Risk is rising over time</h3>
-        <p>Average AI risk score grew from 0.295 in 2015 to an estimated 0.491 by 2035 — a 66% increase — as automation becomes more pervasive across roles.</p>
-      </div>
-      <div class="finding-card">
-        <div class="icon">👤</div>
-        <h3>Experience drives salary</h3>
-        <p>Senior workers earn $48,062 on average vs $22,633 for Entry-level — a 2.1× gap. Risk scores are nearly identical across all experience levels (~0.396).</p>
-      </div>
-    </div>
-
-    <!-- Row 4: Country salaries + Top skills -->
-    <div class="row2" style="margin-top:12px;">
-      <div class="chart-box">
-        <div class="section-title">Average salary by country</div>
-        <div class="bar-row"><span class="bar-label">USA</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#185fa5"></div></div><span class="bar-val">$47,629</span></div>
-        <div class="bar-row"><span class="bar-label">UK</span><div class="bar-track"><div class="bar-fill" style="width:80%;background:#378add"></div></div><span class="bar-val">$38,176</span></div>
-        <div class="bar-row"><span class="bar-label">Australia</span><div class="bar-track"><div class="bar-fill" style="width:77%;background:#378add"></div></div><span class="bar-val">$36,915</span></div>
-        <div class="bar-row"><span class="bar-label">Canada</span><div class="bar-track"><div class="bar-fill" style="width:75%;background:#378add"></div></div><span class="bar-val">$35,850</span></div>
-        <div class="bar-row"><span class="bar-label">Germany</span><div class="bar-track"><div class="bar-fill" style="width:72%;background:#85b7eb"></div></div><span class="bar-val">$34,240</span></div>
-        <div class="bar-row"><span class="bar-label">India</span><div class="bar-track"><div class="bar-fill" style="width:28%;background:#b5d4f4"></div></div><span class="bar-val">$13,615</span></div>
-      </div>
-      <div class="chart-box">
-        <div class="section-title">Top skills by AI risk score</div>
-        <div class="bar-row"><span class="bar-label">Excel</span><div class="bar-track"><div class="bar-fill" style="width:88%;background:#d4621a"></div></div><span class="bar-val">0.750</span></div>
-        <div class="bar-row"><span class="bar-label">SQL</span><div class="bar-track"><div class="bar-fill" style="width:76%;background:#d4621a"></div></div><span class="bar-val">0.649</span></div>
-        <div class="bar-row"><span class="bar-label">Java</span><div class="bar-track"><div class="bar-fill" style="width:53%;background:#e8a020"></div></div><span class="bar-val">0.447</span></div>
-        <div class="bar-row"><span class="bar-label">Strategy</span><div class="bar-track"><div class="bar-fill" style="width:47%;background:#e8a020"></div></div><span class="bar-val">0.401</span></div>
-        <div class="bar-row"><span class="bar-label">AWS</span><div class="bar-track"><div class="bar-fill" style="width:42%;background:#1d9e75"></div></div><span class="bar-val">0.353</span></div>
-        <div style="margin-top:14px;">
-          <div class="section-title" style="margin-bottom:6px;">Top skills by avg salary</div>
-          <div class="bar-row"><span class="bar-label">Deep Learning</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#1d9e75"></div></div><span class="bar-val">$46,128</span></div>
-          <div class="bar-row"><span class="bar-label">Strategy</span><div class="bar-track"><div class="bar-fill" style="width:89%;background:#1d9e75"></div></div><span class="bar-val">$40,940</span></div>
-          <div class="bar-row"><span class="bar-label">AWS</span><div class="bar-track"><div class="bar-fill" style="width:85%;background:#5dcaa5"></div></div><span class="bar-val">$39,385</span></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ══ VIZHUB ══ -->
- <!-- ══ VIZHUB ══ -->
-<div id="panel-vizhub" class="panel">
-  <div class="section-title" style="margin-bottom:8px;font-size:12px;">
-    Vizhub visualizations
-  </div>
-
-  <!-- IMPORTANT: NO inline grid style here -->
-  <div class="viz-grid">
-
-    <!-- 1 -->
-    <div class="viz-embed-card">
-      <div class="iframe-wrap">
-        <button class="max-btn" onclick="openFullscreen(this)">⛶</button>
-        <iframe src="https://vizhub.com/LohithKumar0510/d5cbdde66fa3462b846527d8d0562c1c?mode=embed&embed=branded"></iframe>
-      </div>
-      <div class="viz-title">Donut Chart — Share of Jobs by AI Risk Category</div>
-    </div>
-
-    <!-- 2 -->
-    <div class="viz-embed-card">
-      <div class="iframe-wrap">
-        <button class="max-btn" onclick="openFullscreen(this)">⛶</button>
-        <iframe src="https://vizhub.com/LohithKumar0510/09a0b405b87d4adda32510e38ce42a3f?mode=embed&embed=branded"></iframe>
-      </div>
-      <div class="viz-title">Bubble Chart — Job Openings by Primary Skill</div>
-    </div>
-
-    <!-- 3 -->
-    <div class="viz-embed-card">
-      <div class="iframe-wrap">
-        <button class="max-btn" onclick="openFullscreen(this)">⛶</button>
-        <iframe src="https://vizhub.com/LohithKumar0510/ee39b63a566a4705aa33a7137716c7a6?mode=embed&embed=branded"></iframe>
-      </div>
-      <div class="viz-title">Bar Chart — Average AI Risk Score by Job Title</div>
-    </div>
-
-    <!-- 4 -->
-    <div class="viz-embed-card">
-      <div class="iframe-wrap">
-        <button class="max-btn" onclick="openFullscreen(this)">⛶</button>
-        <iframe src="https://vizhub.com/LohithKumar0510/c855b76d04354ea798412ba5749dd6a8?mode=embed&embed=branded"></iframe>
-      </div>
-      <div class="viz-title">Line Chart — Average Salary Over Time</div>
-    </div>
-
-    <!-- 5 -->
-    <div class="viz-embed-card">
-      <div class="iframe-wrap">
-        <button class="max-btn" onclick="openFullscreen(this)">⛶</button>
-        <iframe src="https://vizhub.com/LohithKumar0510/56d9349ceea242bf9616f7974a8fe5d3?mode=embed&embed=branded"></iframe>
-      </div>
-      <div class="viz-title">Scatter Plot — Salary vs AI Risk Score</div>
-    </div>
-
-    <!-- 6 -->
-    <div class="viz-embed-card">
-      <div class="iframe-wrap">
-        <button class="max-btn" onclick="openFullscreen(this)">⛶</button>
-        <iframe src="https://vizhub.com/LohithKumar0510/5068f19777d3480c912fbece3629d42e?mode=embed&embed=branded"></iframe>
-      </div>
-      <div class="viz-title">Bar Chart — Average Salary by Country</div>
-    </div>
-
-  </div>
-</div>
-
-  <!-- ══ TABLEAU ══ -->
-  <div id="panel-tableau" class="panel">
-    <div class="section-title" style="margin-bottom:8px;font-size:12px;">Tableau visualizations</div>
-    <div class="viz-grid">
-
-      <div class="tableau-card">
-        <div class="tableau-img-wrap">
-          <img src="image1.png" alt="Horizontal Bar Chart: Total Job Openings by Job Title" loading="lazy" />
-        </div>
-        <div class="viz-title">Horizontal Bar Chart — Total Job Openings by Job Title</div>
-      </div>
-
-      <div class="tableau-card">
-        <div class="tableau-img-wrap">
-          <img src="image2.png" alt="Line Chart: Average Risk Score Over Time (2015–2035)" loading="lazy" />
-        </div>
-        <div class="viz-title">Line Chart — Average Risk Score Over Time (2015–2035)</div>
-      </div>
-
-      <div class="tableau-card">
-        <div class="tableau-img-wrap">
-          <img src="Image3.png" alt="Scatter Plot: Comparison of Salary and Occupation in 6 Countries" loading="lazy" />
-        </div>
-        <div class="viz-title">Scatter Plot — Salary vs Occupation across 6 Countries</div>
-      </div>
-
-      <div class="tableau-card">
-        <div class="tableau-img-wrap">
-          <img src="image4.png" alt="Symbol Map: AI Risk Across Countries" loading="lazy" />
-        </div>
-        <div class="viz-title">Symbol Map — AI Risk Across Countries</div>
-      </div>
-
-      <div class="tableau-card">
-        <div class="tableau-img-wrap">
-          <img src="image5.png" alt="Line Chart: Skill Demand Trend from 2015 to 2035" loading="lazy" />
-        </div>
-        <div class="viz-title">Line Chart — Skill Demand Trend 2015–2035</div>
-      </div>
-
-      <div class="tableau-card">
-        <div class="tableau-img-wrap">
-          <img src="image6.png" alt="Heatmap: Country vs Job Title" loading="lazy" />
-        </div>
-        <div class="viz-title">Heatmap — Country vs Job Title</div>
-      </div>
-
-      <div class="tableau-card">
-        <div class="tableau-img-wrap">
-          <img src="image7.png" alt="Bubble Chart: Job Occupations with Most Openings" loading="lazy" />
-        </div>
-        <div class="viz-title">Bubble Chart — Occupations with Most Openings</div>
-      </div>
-
-      <div class="tableau-card">
-        <div class="tableau-img-wrap">
-          <img src="image8.png" alt="Bubble Chart: Jobs with Highest Salaries" loading="lazy" />
-        </div>
-        <div class="viz-title">Bubble Chart — Jobs with Highest Salaries</div>
-      </div>
-
+  <div class="hero">
+    <div class="hero-inner">
+      <h1>The Future of Work — <em>AI &amp; Jobs</em> 2015–2035</h1>
+      <ul class="hero-bullets">
+        <li>This visualization explores the evolving relationship between Artificial Intelligence, job markets, skills, and salaries across the globe from 2015 to 2035.</li>
+        <li>With the rapid rise of AI technologies, questions like "Will AI replace my job?" and "Which skills are future-proof?" have become more relevant than ever. This visualization is designed to answer these questions using data-driven insights and visualization-ready features.</li>
+      </ul>
     </div>
   </div>
 
-</div>
+  <div class="container">
 
-<footer>
-  Data sources: World Economic Forum, McKinsey Global Institute, OECD, ILO · 2015–2035
-</footer>
+    <div class="tabs">
+      <button class="tab tab-orange" onclick="switchTab('overview')">My Dataset Overview</button>
+      <button class="tab tab-white" onclick="switchTab('vizhub')">Vizhub Visualizations</button>
+      <button class="tab tab-green" onclick="switchTab('tableau')">Tableau</button>
+    </div>
 
-<script>
-  function switchTab(name) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('panel-' + name).classList.add('active');
-    document.querySelectorAll('.tab').forEach(t => { t.style.opacity = '0.65'; });
-    const map = { overview: 0, vizhub: 1, tableau: 2 };
-    document.querySelectorAll('.tab')[map[name]].style.opacity = '1';
-    if (name === 'vizhub') scaleIframes();
-  }
+    <!-- ══ OVERVIEW ══ -->
+    <div id="panel-overview" class="panel active">
 
-function scaleIframes() {
-  document.querySelectorAll('.iframe-wrap').forEach(wrap => {
-    const iframe = wrap.querySelector('iframe');
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-num">12,343</div>
+          <div class="stat-label">job records across 6 countries</div>
+          <div class="stat-change pos">2015 – 2035</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">311M</div>
+          <div class="stat-label">total job openings in dataset</div>
+          <div class="stat-change pos">across 10 job titles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">$34,554</div>
+          <div class="stat-label">overall average salary (USD)</div>
+          <div class="stat-change pos">range: $3,875 – $113,589</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">0.396</div>
+          <div class="stat-label">mean AI risk score (0–1 scale)</div>
+          <div class="stat-change neg">↑ from 0.295 in 2015 to 0.491 in 2035</div>
+        </div>
+      </div>
 
-    const baseWidth = 1200;
-    const baseHeight = 650;
+      <div class="row2" style="margin-top:0;margin-bottom:12px;">
+        <div class="chart-box">
+          <div class="section-title">AI risk category breakdown</div>
+          <div class="bar-row"><span class="bar-label">Medium Risk</span><div class="bar-track"><div class="bar-fill" style="width:48.7%;background:#e8a020"></div></div><span class="bar-val">48.7%</span></div>
+          <div class="bar-row"><span class="bar-label">Low Risk</span><div class="bar-track"><div class="bar-fill" style="width:32.7%;background:#1d9e75"></div></div><span class="bar-val">32.7%</span></div>
+          <div class="bar-row"><span class="bar-label">High Risk</span><div class="bar-track"><div class="bar-fill" style="width:18.6%;background:#d4621a"></div></div><span class="bar-val">18.6%</span></div>
+          <div style="margin-top:14px;">
+            <div class="section-title" style="margin-bottom:6px;">Avg salary by risk category</div>
+            <div class="bar-row"><span class="bar-label">Low Risk</span><div class="bar-track"><div class="bar-fill" style="width:80%;background:#1d9e75"></div></div><span class="bar-val">$36,615</span></div>
+            <div class="bar-row"><span class="bar-label">Medium Risk</span><div class="bar-track"><div class="bar-fill" style="width:82%;background:#e8a020"></div></div><span class="bar-val">$37,450</span></div>
+            <div class="bar-row"><span class="bar-label">High Risk</span><div class="bar-track"><div class="bar-fill" style="width:51%;background:#d4621a"></div></div><span class="bar-val">$23,334</span></div>
+          </div>
+        </div>
 
-    const scale = wrap.offsetWidth / baseWidth;
+        <div class="chart-box">
+          <div class="section-title">Average salary trend (2015–2035)</div>
+          <svg viewBox="0 0 280 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:140px">
+            <polyline points="10,118 23,114 36,115 49,110 62,102 75,106 88,104 101,98 114,94 127,93 140,89 153,84 166,78 179,72 192,64 205,56 218,48 231,38 244,28 257,18 270,10"
+              fill="none" stroke="#1d9e75" stroke-width="2" stroke-linejoin="round"/>
+            <text x="10" y="132" font-size="9" fill="#9a9990" font-family="DM Sans,sans-serif">2015</text>
+            <text x="110" y="132" font-size="9" fill="#9a9990" font-family="DM Sans,sans-serif">2025</text>
+            <text x="240" y="132" font-size="9" fill="#9a9990" font-family="DM Sans,sans-serif">2035</text>
+            <text x="272" y="13" font-size="9" fill="#1d9e75" font-family="DM Sans,sans-serif">↑</text>
+            <text x="4" y="118" font-size="8" fill="#9a9990" font-family="DM Sans,sans-serif">$27K</text>
+            <text x="248" y="14" font-size="8" fill="#9a9990" font-family="DM Sans,sans-serif">$44K</text>
+          </svg>
 
-    iframe.style.transform = `scale(${scale})`;
-    wrap.style.height = (baseHeight * scale) + "px";
-  });
-}
+          <div class="section-title" style="margin-top:8px;margin-bottom:6px;">Job survival outlook</div>
+          <div class="bar-row"><span class="bar-label">Will survive</span><div class="bar-track"><div class="bar-fill" style="width:42%;background:#1d9e75"></div></div><span class="bar-val">42%</span></div>
+          <div class="bar-row"><span class="bar-label">Likely survive</span><div class="bar-track"><div class="bar-fill" style="width:47%;background:#e8a020"></div></div><span class="bar-val">47%</span></div>
+          <div class="bar-row"><span class="bar-label">At risk</span><div class="bar-track"><div class="bar-fill" style="width:11%;background:#d4621a"></div></div><span class="bar-val">11%</span></div>
+        </div>
+      </div>
 
-  window.addEventListener('load', scaleIframes);
-  window.addEventListener('resize', scaleIframes);
-  document.addEventListener('DOMContentLoaded', scaleIframes);
-  function openFullscreen(btn) {
-  const src = btn.parentElement.querySelector("iframe").src;
-  document.getElementById("fullscreenFrame").src = src;
-  document.getElementById("fullscreenModal").style.display = "flex";
-}
+      <div class="section-title">Key findings</div>
+      <div class="findings">
+        <div class="finding-card">
+          <div class="icon">🏆</div>
+          <h3>Highest paying roles</h3>
+          <p>AI Researcher ($46,128), ML Engineer ($41,360), and Product Manager ($40,940) lead in average salary — all above the dataset mean of $34,554.</p>
+        </div>
+        <div class="finding-card">
+          <div class="icon">⚠️</div>
+          <h3>Most at-risk roles</h3>
+          <p>Data Analyst ($20,310 avg) and Business Analyst ($24,783) are the lowest-paid titles — yet Business Analyst has the most job openings (33.6M).</p>
+        </div>
+        <div class="finding-card">
+          <div class="icon">🌍</div>
+          <h3>USA leads on salary</h3>
+          <p>USA averages $47,629 — 3.5× higher than India ($13,615). UK ($38,176) and Australia ($36,915) follow. All 6 countries share similar avg risk scores (~0.395).</p>
+        </div>
+        <div class="finding-card">
+          <div class="icon">💡</div>
+          <h3>Most in-demand skill</h3>
+          <p>Python dominates with 2,430 records. Excel has the highest AI risk score (0.75) while Deep Learning commands the highest avg salary at $46,128.</p>
+        </div>
+        <div class="finding-card">
+          <div class="icon">📈</div>
+          <h3>Risk is rising over time</h3>
+          <p>Average AI risk score grew from 0.295 in 2015 to an estimated 0.491 by 2035 — a 66% increase — as automation becomes more pervasive across roles.</p>
+        </div>
+        <div class="finding-card">
+          <div class="icon">👤</div>
+          <h3>Experience drives salary</h3>
+          <p>Senior workers earn $48,062 on average vs $22,633 for Entry-level — a 2.1× gap. Risk scores are nearly identical across all experience levels (~0.396).</p>
+        </div>
+      </div>
 
-function closeFullscreen() {
-  document.getElementById("fullscreenModal").style.display = "none";
-  document.getElementById("fullscreenFrame").src = "";
-}
-</script>
+      <div class="row2" style="margin-top:12px;">
+        <div class="chart-box">
+          <div class="section-title">Average salary by country</div>
+          <div class="bar-row"><span class="bar-label">USA</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#185fa5"></div></div><span class="bar-val">$47,629</span></div>
+          <div class="bar-row"><span class="bar-label">UK</span><div class="bar-track"><div class="bar-fill" style="width:80%;background:#378add"></div></div><span class="bar-val">$38,176</span></div>
+          <div class="bar-row"><span class="bar-label">Australia</span><div class="bar-track"><div class="bar-fill" style="width:77%;background:#378add"></div></div><span class="bar-val">$36,915</span></div>
+          <div class="bar-row"><span class="bar-label">Canada</span><div class="bar-track"><div class="bar-fill" style="width:75%;background:#378add"></div></div><span class="bar-val">$35,850</span></div>
+          <div class="bar-row"><span class="bar-label">Germany</span><div class="bar-track"><div class="bar-fill" style="width:72%;background:#85b7eb"></div></div><span class="bar-val">$34,240</span></div>
+          <div class="bar-row"><span class="bar-label">India</span><div class="bar-track"><div class="bar-fill" style="width:28%;background:#b5d4f4"></div></div><span class="bar-val">$13,615</span></div>
+        </div>
+        <div class="chart-box">
+          <div class="section-title">Top skills by AI risk score</div>
+          <div class="bar-row"><span class="bar-label">Excel</span><div class="bar-track"><div class="bar-fill" style="width:88%;background:#d4621a"></div></div><span class="bar-val">0.750</span></div>
+          <div class="bar-row"><span class="bar-label">SQL</span><div class="bar-track"><div class="bar-fill" style="width:76%;background:#d4621a"></div></div><span class="bar-val">0.649</span></div>
+          <div class="bar-row"><span class="bar-label">Java</span><div class="bar-track"><div class="bar-fill" style="width:53%;background:#e8a020"></div></div><span class="bar-val">0.447</span></div>
+          <div class="bar-row"><span class="bar-label">Strategy</span><div class="bar-track"><div class="bar-fill" style="width:47%;background:#e8a020"></div></div><span class="bar-val">0.401</span></div>
+          <div class="bar-row"><span class="bar-label">AWS</span><div class="bar-track"><div class="bar-fill" style="width:42%;background:#1d9e75"></div></div><span class="bar-val">0.353</span></div>
+          <div style="margin-top:14px;">
+            <div class="section-title" style="margin-bottom:6px;">Top skills by avg salary</div>
+            <div class="bar-row"><span class="bar-label">Deep Learning</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#1d9e75"></div></div><span class="bar-val">$46,128</span></div>
+            <div class="bar-row"><span class="bar-label">Strategy</span><div class="bar-track"><div class="bar-fill" style="width:89%;background:#1d9e75"></div></div><span class="bar-val">$40,940</span></div>
+            <div class="bar-row"><span class="bar-label">AWS</span><div class="bar-track"><div class="bar-fill" style="width:85%;background:#5dcaa5"></div></div><span class="bar-val">$39,385</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <!-- ══ VIZHUB ══ -->
+    <div id="panel-vizhub" class="panel">
+      <div class="section-title" style="margin-bottom:8px;font-size:12px;">
+        Vizhub visualizations
+      </div>
+
+      <div class="viz-grid">
+
+        <div class="viz-embed-card" onclick="openFullscreen(this)">
+          <div class="iframe-wrap">
+            <button class="max-btn" onclick="event.stopPropagation(); openFullscreen(this)">⛶</button>
+            <iframe src="https://vizhub.com/LohithKumar0510/d5cbdde66fa3462b846527d8d0562c1c?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Donut Chart — Share of Jobs by AI Risk Category" loading="lazy"></iframe>
+          </div>
+          <div class="viz-title">Donut Chart — Share of Jobs by AI Risk Category</div>
+        </div>
+
+        <div class="viz-embed-card" onclick="openFullscreen(this)">
+          <div class="iframe-wrap">
+            <button class="max-btn" onclick="event.stopPropagation(); openFullscreen(this)">⛶</button>
+            <iframe src="https://vizhub.com/LohithKumar0510/09a0b405b87d4adda32510e38ce42a3f?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Bubble Chart — Job Openings by Primary Skill" loading="lazy"></iframe>
+          </div>
+          <div class="viz-title">Bubble Chart — Job Openings by Primary Skill</div>
+        </div>
+
+        <div class="viz-embed-card" onclick="openFullscreen(this)">
+          <div class="iframe-wrap">
+            <button class="max-btn" onclick="event.stopPropagation(); openFullscreen(this)">⛶</button>
+            <iframe src="https://vizhub.com/LohithKumar0510/ee39b63a566a4705aa33a7137716c7a6?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Bar Chart — Average AI Risk Score by Job Title" loading="lazy"></iframe>
+          </div>
+          <div class="viz-title">Bar Chart — Average AI Risk Score by Job Title</div>
+        </div>
+
+        <div class="viz-embed-card" onclick="openFullscreen(this)">
+          <div class="iframe-wrap">
+            <button class="max-btn" onclick="event.stopPropagation(); openFullscreen(this)">⛶</button>
+            <iframe src="https://vizhub.com/LohithKumar0510/c855b76d04354ea798412ba5749dd6a8?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Line Chart — Average Salary Over Time" loading="lazy"></iframe>
+          </div>
+          <div class="viz-title">Line Chart — Average Salary Over Time</div>
+        </div>
+
+        <div class="viz-embed-card" onclick="openFullscreen(this)">
+          <div class="iframe-wrap">
+            <button class="max-btn" onclick="event.stopPropagation(); openFullscreen(this)">⛶</button>
+            <iframe src="https://vizhub.com/LohithKumar0510/56d9349ceea242bf9616f7974a8fe5d3?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Scatter Plot — Salary vs AI Risk Score" loading="lazy"></iframe>
+          </div>
+          <div class="viz-title">Scatter Plot — Salary vs AI Risk Score</div>
+        </div>
+
+        <div class="viz-embed-card" onclick="openFullscreen(this)">
+          <div class="iframe-wrap">
+            <button class="max-btn" onclick="event.stopPropagation(); openFullscreen(this)">⛶</button>
+            <iframe src="https://vizhub.com/LohithKumar0510/5068f19777d3480c912fbece3629d42e?mode=embed&embed=branded" scrolling="no" frameborder="no" title="Bar Chart — Average Salary by Country" loading="lazy"></iframe>
+          </div>
+          <div class="viz-title">Bar Chart — Average Salary by Country</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ TABLEAU ══ -->
+    <div id="panel-tableau" class="panel">
+      <div class="section-title" style="margin-bottom:8px;font-size:12px;">Tableau visualizations</div>
+      <div class="viz-grid">
+
+        <div class="tableau-card">
+          <div class="tableau-img-wrap">
+            <img src="image1.png" alt="Horizontal Bar Chart: Total Job Openings by Job Title" loading="lazy" />
+          </div>
+          <div class="viz-title">Horizontal Bar Chart — Total Job Openings by Job Title</div>
+        </div>
+
+        <div class="tableau-card">
+          <div class="tableau-img-wrap">
+            <img src="image2.png" alt="Line Chart: Average Risk Score Over Time (2015–2035)" loading="lazy" />
+          </div>
+          <div class="viz-title">Line Chart — Average Risk Score Over Time (2015–2035)</div>
+        </div>
+
+        <div class="tableau-card">
+          <div class="tableau-img-wrap">
+            <img src="Image3.png" alt="Scatter Plot: Comparison of Salary and Occupation in 6 Countries" loading="lazy" />
+          </div>
+          <div class="viz-title">Scatter Plot — Salary vs Occupation across 6 Countries</div>
+        </div>
+
+        <div class="tableau-card">
+          <div class="tableau-img-wrap">
+            <img src="image4.png" alt="Symbol Map: AI Risk Across Countries" loading="lazy" />
+          </div>
+          <div class="viz-title">Symbol Map — AI Risk Across Countries</div>
+        </div>
+
+        <div class="tableau-card">
+          <div class="tableau-img-wrap">
+            <img src="image5.png" alt="Line Chart: Skill Demand Trend from 2015 to 2035" loading="lazy" />
+          </div>
+          <div class="viz-title">Line Chart — Skill Demand Trend 2015–2035</div>
+        </div>
+
+        <div class="tableau-card">
+          <div class="tableau-img-wrap">
+            <img src="image6.png" alt="Heatmap: Country vs Job Title" loading="lazy" />
+          </div>
+          <div class="viz-title">Heatmap — Country vs Job Title</div>
+        </div>
+
+        <div class="tableau-card">
+          <div class="tableau-img-wrap">
+            <img src="image7.png" alt="Bubble Chart: Job Occupations with Most Openings" loading="lazy" />
+          </div>
+          <div class="viz-title">Bubble Chart — Occupations with Most Openings</div>
+        </div>
+
+        <div class="tableau-card">
+          <div class="tableau-img-wrap">
+            <img src="image8.png" alt="Bubble Chart: Jobs with Highest Salaries" loading="lazy" />
+          </div>
+          <div class="viz-title">Bubble Chart — Jobs with Highest Salaries</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Data sources: World Economic Forum, McKinsey Global Institute, OECD, ILO · 2015–2035
+  </footer>
+
+  <script>
+    function switchTab(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      document.querySelectorAll('.tab').forEach(t => { t.style.opacity = '0.65'; });
+      const map = { overview: 0, vizhub: 1, tableau: 2 };
+      document.querySelectorAll('.tab')[map[name]].style.opacity = '1';
+      if (name === 'vizhub') scaleIframes();
+    }
+
+    function scaleIframes() {
+      document.querySelectorAll('.iframe-wrap').forEach(wrap => {
+        const iframe = wrap.querySelector('iframe');
+        const baseWidth = 1200;
+        const baseHeight = 650;
+        const scale = wrap.offsetWidth / baseWidth;
+        iframe.style.transform = `scale(${scale})`;
+        wrap.style.height = (baseHeight * scale) + "px";
+      });
+    }
+
+    function openFullscreen(element) {
+      let iframe;
+
+      if (element.tagName.toLowerCase() === "button") {
+        iframe = element.parentElement.querySelector("iframe");
+      } else {
+        iframe = element.querySelector("iframe");
+      }
+
+      if (!iframe) return;
+
+      document.getElementById("fullscreenFrame").src = iframe.src;
+      document.getElementById("fullscreenModal").style.display = "flex";
+    }
+
+    function closeFullscreen() {
+      document.getElementById("fullscreenModal").style.display = "none";
+      document.getElementById("fullscreenFrame").src = "";
+    }
+
+    window.addEventListener('load', scaleIframes);
+    window.addEventListener('resize', scaleIframes);
+    document.addEventListener('DOMContentLoaded', scaleIframes);
+
+    document.getElementById("fullscreenModal").addEventListener("click", function(e) {
+      if (e.target === this) {
+        closeFullscreen();
+      }
+    });
+  </script>
 </body>
 </html>
